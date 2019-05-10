@@ -20,16 +20,23 @@ router.get('/', async (req, res) => {
 
   router.post('/', async (req, res) => {
 
-    try {
-      const post = await Posts.insert(req.body);
-      res.status(201).json(post);
-    } catch (error) {
-      // log error to database
-      console.log(error);
-      res.status(500).json({
-        message: 'Error adding the Post',
-      });
+    if(req.body.title && req.body.contents){
+        try {
+            const post = await Posts.insert(req.body);
+            res.status(201).json(post);
+          } catch (error) {
+            // log error to database
+            console.log(error);
+            res.status(500).json({
+              message: 'Error while saving the post to the database.',
+            });
+          }
+    } else {
+        res.status(400).json({
+            message: "Please provide title and content for the post"
+        })
     }
+
   });
   
   router.get('/:id', async (req, res) => {
@@ -38,10 +45,10 @@ router.get('/', async (req, res) => {
     try{
         const post = await Posts.findById(postId);
 
-        if (post) {
+        if (post.id === postId) {
             res.status(200).json(post)
         } else {
-            res.status(404).json({errorMessage: "Post Not Found"})
+            res.status(404).json({errorMessage: "Post with that id does not exist"})
         }
     } catch (error) {
         console.log(error);
@@ -57,15 +64,15 @@ router.get('/', async (req, res) => {
       try{
           const posts = await Posts.remove(postId)
 
-          if (posts) {
+          if (posts.id === postId) {
               res.status(200).json({message: "post Deleted"})
           } else {
-              res.status(404).json({errorMessage: "Post not found"})
+              res.status(404).json({errorMessage: "The post with the specified ID does not exist."})
           }
       } catch (error) {
           console.log(error);
           res.status(500).json({
-              errorMessage: "error removing individual post"
+              errorMessage: "The post could not be removed"
           })
       }
   })
