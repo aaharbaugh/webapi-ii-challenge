@@ -48,12 +48,12 @@ router.get('/', async (req, res) => {
         if (post.id === postId) {
             res.status(200).json(post)
         } else {
-            res.status(404).json({errorMessage: "Post with that id does not exist"})
+            res.status(404).json({message: "Post with that id does not exist"})
         }
     } catch (error) {
         console.log(error);
         res.status(500).json({
-            errorMessage: "error retrieving individual post."
+            message: "error retrieving individual post."
         })
     }
   })
@@ -67,12 +67,12 @@ router.get('/', async (req, res) => {
           if (posts.id === postId) {
               res.status(200).json({message: "post Deleted"})
           } else {
-              res.status(404).json({errorMessage: "The post with the specified ID does not exist."})
+              res.status(404).json({message: "The post with the specified ID does not exist."})
           }
       } catch (error) {
           console.log(error);
           res.status(500).json({
-              errorMessage: "The post could not be removed"
+              message: "The post could not be removed"
           })
       }
   })
@@ -80,20 +80,27 @@ router.get('/', async (req, res) => {
   router.put('/:id', async (req, res) => {
       const postId = req.params.id;
 
-      try{
-          const posts = await Posts.update(postId, req.body)
-
-          if(posts){
-              res.status(200).json({message: "Post Updated"})
-          } else {
-              res.status(404).json({errorMessage: "Post Not Found"})
-          }
-      } catch (error) {
-          console.log(error);
-          res.status(500).json({
-              errorMessage: "error updating individual post"
+      if(req.body.title && req.body.contents){
+        try{
+            const posts = await Posts.update(postId, req.body)
+  
+            if(posts.id === postId){
+                res.status(200).json({message: "Post Updated"})
+            } else {
+                res.status(404).json({message: "The post with the specified ID does not exist."})
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                message: "error updating individual post"
+            })
+        }
+      } else {
+          res.status(400).json({
+              error: "Please provide title and contents for the post. "
           })
       }
+      
   })
 
 module.exports = router;
