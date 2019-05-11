@@ -44,7 +44,7 @@ router.get('/', async (req, res) => {
 
     try{
         const post = await Posts.findById(postId);
-
+        console.log(post + postId)
         if (post.id === postId) {
             res.status(200).json(post)
         } else {
